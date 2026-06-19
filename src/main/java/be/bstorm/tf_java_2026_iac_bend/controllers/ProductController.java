@@ -3,6 +3,9 @@ package be.bstorm.tf_java_2026_iac_bend.controllers;
 import be.bstorm.tf_java_2026_iac_bend.entities.Product;
 import be.bstorm.tf_java_2026_iac_bend.repositories.ProductRepository;
 import be.bstorm.tf_java_2026_iac_bend.services.BlobService;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,13 +44,14 @@ public class ProductController {
     }
 
     @GetMapping("/image")
-    public ResponseEntity<byte[]> getImage() {
+    public ResponseEntity<Resource> getImage() {
         try {
-            byte[] data = blobService.downloadBlob("machin");
-            String contentType = blobService.getBlobContentType("machin");
+            BlobService.BlobDownload blob = blobService.downloadBlobStream("machin");
             return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(contentType))
-                    .body(data);
+                    .contentType(MediaType.parseMediaType(blob.contentType()))
+                    .contentLength(blob.size())
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + blob.fileName() + "\"")
+                    .body(new InputStreamResource(blob.stream()));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }

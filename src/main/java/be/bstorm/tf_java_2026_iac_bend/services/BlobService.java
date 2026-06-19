@@ -4,10 +4,12 @@ import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.models.BlobHttpHeaders;
+import com.azure.storage.blob.models.BlobProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 @Service
 public class BlobService {
@@ -39,8 +41,23 @@ public class BlobService {
     public byte[] downloadBlob(String blobName) {
         BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(containerName);
         BlobClient blobClient = containerClient.getBlobClient(blobName);
-        
+
         return blobClient.downloadContent().toBytes();
+    }
+
+    public BlobDownload downloadBlobStream(String blobName) {
+        BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(containerName);
+        BlobClient blobClient = containerClient.getBlobClient(blobName);
+        BlobProperties properties = blobClient.getProperties();
+
+        String contentType = properties.getContentType() != null && !properties.getContentType().isBlank()
+                ? properties.getContentType()
+                : "application/octet-stream";
+
+        String fileName = blobName.contains("/") ? blobName.substring(blobName.lastIndexOf('/') + 1) : blobName;
+        InputStream stream = blobClient.openInputStream();
+
+        return new BlobDownload(stream, contentType, fileName, properties.getBlobSize());
     }
 
     /**
@@ -63,11 +80,6 @@ public class BlobService {
         return blobClient.getBlobUrl();
     }
 
-    public String getBlobContentType(String blobName) {
-        BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(containerName);
-        BlobClient blobClient = containerClient.getBlobClient(blobName);
-
-        String contentType = blobClient.getProperties().getContentType();
-        return contentType != null && !contentType.isBlank() ? contentType : "application/octet-stream";
+    public record BlobDownload(InputStream stream, String contentType, String fileName, long size) {
     }
 }
