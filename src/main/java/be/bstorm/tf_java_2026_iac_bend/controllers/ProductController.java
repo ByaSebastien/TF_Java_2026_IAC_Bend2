@@ -3,6 +3,7 @@ package be.bstorm.tf_java_2026_iac_bend.controllers;
 import be.bstorm.tf_java_2026_iac_bend.entities.Product;
 import be.bstorm.tf_java_2026_iac_bend.repositories.ProductRepository;
 import be.bstorm.tf_java_2026_iac_bend.services.BlobService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,8 +28,8 @@ public class ProductController {
         return ResponseEntity.ok(productRepository.findAll());
     }
 
-    @PostMapping
-    public ResponseEntity<String> saveImage(MultipartFile file) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> saveImage(@RequestParam("file") MultipartFile file) {
         try {
             String path = blobService.uploadBlob("machin",file);
             Product product = new Product("test", path);
@@ -43,7 +44,10 @@ public class ProductController {
     public ResponseEntity<byte[]> getImage() {
         try {
             byte[] data = blobService.downloadBlob("machin");
-            return ResponseEntity.ok(data);
+            String contentType = blobService.getBlobContentType("machin");
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .body(data);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
