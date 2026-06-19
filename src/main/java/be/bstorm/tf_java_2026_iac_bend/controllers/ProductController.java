@@ -39,4 +39,14 @@ public class ProductController {
             return ResponseEntity.badRequest().body("Erreur lors de l'upload du fichier : " + e.getMessage());
         }
     }
+
+    @GetMapping("/{img}")
+    public ResponseEntity<byte[]> getImage(String img) {
+        try {
+            byte[] data = blobService.downloadBlob(img);
+            return ResponseEntity.ok(data);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
