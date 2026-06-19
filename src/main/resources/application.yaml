@@ -13,7 +13,6 @@ spring:
         format_sql: true
 azure:
   storage:
-    account-name: ${AZURE_STORAGE_ACCOUNT_NAME:tfjava2026storageaccount}
     connection-string: ${BLOB_CONNECTION_STRING}
 server:
   port: 8080

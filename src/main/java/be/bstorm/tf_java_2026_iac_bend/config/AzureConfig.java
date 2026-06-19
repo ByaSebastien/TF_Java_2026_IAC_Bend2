@@ -5,17 +5,24 @@ import com.azure.storage.blob.BlobServiceClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Configuration
 public class AzureConfig {
 
-    @Value("${azure.storage.account-name}")
-    private String accountName;
-    @Value("${azure.storage.connection-string}")
+    private static final Logger logger = LoggerFactory.getLogger(AzureConfig.class);
+
+    @Value("${azure.storage.connection-string:}")
     private String connectionString;
 
     @Bean
     public BlobServiceClient blobServiceClient() {
+        if (connectionString == null || connectionString.isBlank()) {
+            logger.warn("BLOB_CONNECTION_STRING not configured! Blob operations will fail.");
+            throw new IllegalArgumentException("azure.storage.connection-string must be configured");
+        }
+        logger.info("Initializing BlobServiceClient with connection string");
         return new BlobServiceClientBuilder()
                 .connectionString(connectionString)
                 .buildClient();
