@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: TF_Java_2026_IAC_Bend
+  datasource:
+    url: ${DB_CONNECTION_STRING}
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+server:
+  port: 8080
+
