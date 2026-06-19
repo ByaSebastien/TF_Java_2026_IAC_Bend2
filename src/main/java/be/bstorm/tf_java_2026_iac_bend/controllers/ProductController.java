@@ -31,16 +31,18 @@ public class ProductController {
     public ResponseEntity<String> saveImage(MultipartFile file) {
         try {
             String path = blobService.uploadBlob("truc",file);
+            Product product = new Product("test", path);
+            productRepository.save(product);
             return ResponseEntity.ok(path);
         } catch (IOException e) {
             return ResponseEntity.badRequest().body("Erreur lors de l'upload du fichier : " + e.getMessage());
         }
     }
 
-    @GetMapping("/{img}")
-    public ResponseEntity<byte[]> getImage(@PathVariable String img) {
+    @GetMapping("/image")
+    public ResponseEntity<byte[]> getImage() {
         try {
-            byte[] data = blobService.downloadBlob(img);
+            byte[] data = blobService.downloadBlob("truc");
             return ResponseEntity.ok(data);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
