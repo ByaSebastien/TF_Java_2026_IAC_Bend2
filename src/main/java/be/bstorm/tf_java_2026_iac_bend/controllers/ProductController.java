@@ -30,7 +30,7 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<String> saveImage(MultipartFile file) {
         try {
-            String path = blobService.uploadBlob("truc",file);
+            String path = blobService.uploadBlob("machin",file);
             Product product = new Product("test", path);
             productRepository.save(product);
             return ResponseEntity.ok(path);
@@ -42,7 +42,7 @@ public class ProductController {
     @GetMapping("/image")
     public ResponseEntity<byte[]> getImage() {
         try {
-            byte[] data = blobService.downloadBlob("truc");
+            byte[] data = blobService.downloadBlob("machin");
             return ResponseEntity.ok(data);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
