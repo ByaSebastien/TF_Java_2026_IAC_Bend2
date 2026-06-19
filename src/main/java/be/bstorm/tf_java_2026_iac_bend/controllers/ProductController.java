@@ -4,10 +4,7 @@ import be.bstorm.tf_java_2026_iac_bend.entities.Product;
 import be.bstorm.tf_java_2026_iac_bend.repositories.ProductRepository;
 import be.bstorm.tf_java_2026_iac_bend.services.BlobService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -41,7 +38,7 @@ public class ProductController {
     }
 
     @GetMapping("/{img}")
-    public ResponseEntity<byte[]> getImage(String img) {
+    public ResponseEntity<byte[]> getImage(@PathVariable String img) {
         try {
             byte[] data = blobService.downloadBlob(img);
             return ResponseEntity.ok(data);
